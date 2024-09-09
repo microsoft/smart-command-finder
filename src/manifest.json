@@ -5,12 +5,18 @@
   "version": "1.0",
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "default.png"
+    "default_icon": "images/default.png"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*"],
+      "matches": ["<all_urls>"]
     }
   ],
   "background": {
