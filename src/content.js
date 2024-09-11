@@ -64,11 +64,11 @@ style.textContent = `
   }
   .item {
     margin-top: 16px;
-    height: 56px;
     padding: 8px 28px;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    align-items: start;
+    flex-direction: column;
   }
   .item:hover {
     border-radius: 16px;
@@ -88,6 +88,18 @@ style.textContent = `
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%;
+  }
+  .item > .description {
+    color: #16394A;
+    font-family: "Segoe Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 200;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
   }
 
 `;
@@ -116,10 +128,21 @@ document.addEventListener('keydown', function (event) {
   }
 });
 
-commandDom.shadowRoot.querySelector('input').addEventListener('input', function (event) {
+const debounce = (callback, wait = 500) => {
+  let timeoutId = null;
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+}
+
+const handleInutChange = debounce(() => {
   const url = location.href;
-  const keywords = event.target.value;
+  const keywords = commandDom.shadowRoot.querySelector('input').value;
   chrome.runtime.sendMessage({ url, keywords }, res => {
+    if (!res) return;
     const listDom = commandDom.shadowRoot.querySelector('.list');
     while (listDom.firstChild) {
       listDom.removeChild(listDom.firstChild);
@@ -127,22 +150,27 @@ commandDom.shadowRoot.querySelector('input').addEventListener('input', function 
     res.forEach(extension => {
       const item = document.createElement('div');
       item.className = 'item';
+      // <img class="icon" src=${extension.thumbnail} />
       item.innerHTML = `
-        <img class="icon" src=${extension.thumbnail} />
-        <div class="name">${extension.name}</div>
+        <div class="name">${extension.Name}</div>
+        <div class="description">${extension.Description}</div>
         `;
       listDom.appendChild(item);
     });
   });
 });
 
+commandDom.shadowRoot.querySelector('input').addEventListener('input', handleInutChange);
+
 document.addEventListener('keydown', function (event) {
-  if (event.metaKey && event.key === '/') {
+  if ((event.metaKey || event.ctrlKey) && event.key === '/') {
     if (commandDom.parentNode) {
       commandDom.remove();
     } else {
       document.body.appendChild(commandDom);
       commandDom.shadowRoot.querySelector('input').focus();
+      // default trigger fetch
+      handleInutChange();
     }
   }
 }, true);
