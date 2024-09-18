@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Smart Command Finder",
+  "description": "It is an intelligent tool that helps you quickly find edge features",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "images/default.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
